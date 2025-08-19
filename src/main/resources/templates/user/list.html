@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Usuários</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 1.5rem; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: .5rem; text-align: left; }
+        th { background: #f3f3f3; }
+        a { text-decoration: none; color: #0a558c; }
+    </style>
+</head>
+<body>
+<h1>Lista de Usuários</h1>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th>Role</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="u : ${users}">
+        <td th:text="${u.id}"></td>
+        <td th:text="${u.nome}"></td>
+        <td th:text="${u.email}"></td>
+        <td th:text="${u.status}"></td>
+        <td th:text="${u.role}"></td>
+        <td><a th:href="@{'/users/' + ${u.id}}">Detalhes</a></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
