@@ -1,6 +1,8 @@
 package br.edu.iff.ccc.webappigormonteiro.model;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -35,6 +37,9 @@ public class UserSystem {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Desafio> desafios = new ArrayList<>();
+
     public UserSystem() {}
 
     public UserSystem(Long id, String nome, String email, Status status, Role role) {
@@ -59,4 +64,14 @@ public class UserSystem {
 
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+
+    public List<Desafio> getDesafios() { return desafios; }
+    public void addDesafio(Desafio d) {
+        desafios.add(d);
+        d.setAutor(this);
+    }
+    public void removeDesafio(Desafio d) {
+        desafios.remove(d);
+        d.setAutor(null);
+    }
 }
