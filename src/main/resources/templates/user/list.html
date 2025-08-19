@@ -35,5 +35,40 @@
     </tr>
     </tbody>
 </table>
+
+<h2>Novo Usuário</h2>
+<form th:action="@{/users}" th:object="${userForm}" method="post" style="margin-top:1rem;">
+    <div>
+        <label>Nome:<br>
+            <input type="text" th:field="*{nome}" />
+        </label>
+        <div style="color:red" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></div>
+    </div>
+    <div>
+        <label>Email:<br>
+            <input type="email" th:field="*{email}" />
+        </label>
+        <div style="color:red" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+    </div>
+    <div>
+        <label>Status:<br>
+            <select th:field="*{status}">
+                <option th:each="s : ${T(br.edu.iff.ccc.webappigormonteiro.model.UserSystem.Status).values()}" th:value="${s}" th:text="${s}"></option>
+            </select>
+        </label>
+        <div style="color:red" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></div>
+    </div>
+    <div>
+        <label>Role:<br>
+            <select th:field="*{role}">
+                <option th:each="r : ${T(br.edu.iff.ccc.webappigormonteiro.model.UserSystem.Role).values()}" th:value="${r}" th:text="${r}"></option>
+            </select>
+        </label>
+        <div style="color:red" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></div>
+    </div>
+    <div style="margin-top:.5rem;">
+        <button type="submit">Salvar</button>
+    </div>
+</form>
 </body>
 </html>

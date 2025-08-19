@@ -4,9 +4,10 @@ import br.edu.iff.ccc.webappigormonteiro.model.UserSystem;
 import br.edu.iff.ccc.webappigormonteiro.service.UserSystemService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/users")
@@ -21,6 +22,7 @@ public class UserSystemController {
     @GetMapping
     public String listar(Model model) {
         model.addAttribute("users", service.listarTodos());
+    model.addAttribute("userForm", new UserSystem());
         return "user/list"; // templates/user/list.html
     }
 
@@ -29,5 +31,17 @@ public class UserSystemController {
         UserSystem user = service.buscarPorId(id).orElse(null);
         model.addAttribute("user", user);
         return "user/detail"; // templates/user/detail.html
+    }
+
+    @PostMapping
+    public String criar(@Valid @ModelAttribute("userForm") UserSystem form,
+                        BindingResult bindingResult,
+                        Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("users", service.listarTodos());
+            return "user/list"; // Reexibe a lista com erros
+        }
+        service.criar(new UserSystem(null, form.getNome(), form.getEmail(), form.getStatus(), form.getRole()));
+        return "redirect:/users";
     }
 }
