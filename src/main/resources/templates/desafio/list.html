@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Desafios</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2rem; }
+        table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
+        th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
+        th { background: #f0f0f0; }
+        form.inline { display: inline; }
+        .form-container { margin-top: 2rem; }
+        label { display: block; margin-top: .5rem; }
+        input, select { padding: .4rem; }
+    </style>
+</head>
+<body>
+<h1>Desafios</h1>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Dificuldade</th>
+        <th>Autor</th>
+        <th>Linguagem</th>
+        <th>Ações</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="d : ${desafios}">
+        <td th:text="${d.id}"></td>
+        <td th:text="${d.dificuldade}"></td>
+        <td th:text="${d.autor != null ? d.autor.nome : '—'}"></td>
+        <td th:text="${d.linguagemUtilizada}"></td>
+        <td>
+            <form th:action="@{'/desafios/' + ${d.id} + '/delete'}" method="post" class="inline">
+                <button type="submit">Excluir</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<div class="form-container">
+    <h2>Novo Desafio</h2>
+    <form action="/desafios" method="post">
+        <label>Dificuldade:
+            <input name="dificuldade" required />
+        </label>
+        <label>Autor:
+            <select name="autorId" required>
+                <option value="" disabled selected>Selecione...</option>
+                <option th:each="u : ${users}" th:value="${u.id}" th:text="${u.nome}"></option>
+            </select>
+        </label>
+        <label>Linguagem:
+            <input name="linguagemUtilizada" required />
+        </label>
+        <button type="submit">Salvar</button>
+    </form>
+</div>
+
+<p><a href="/users">Voltar Usuários</a></p>
+</body>
+</html>

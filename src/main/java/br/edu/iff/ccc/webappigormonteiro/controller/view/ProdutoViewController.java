@@ -1,5 +1,7 @@
 package br.edu.iff.ccc.webappigormonteiro.controller.view;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +15,7 @@ import java.math.BigDecimal;
 @Controller
 @RequestMapping("/produto")
 public class ProdutoViewController {
+    private static final Logger log = LoggerFactory.getLogger(ProdutoViewController.class);
 
     @GetMapping("/{id}")
     public String detalharProduto(@PathVariable("id") Long id, Model model) {
@@ -30,11 +33,8 @@ public class ProdutoViewController {
     public String criarProduto(@RequestParam("NOME") String nome,
                                @RequestParam("DESCRICAO") String descricao,
                                @RequestParam("PRECO") BigDecimal preco) {
-        System.out.println("=== Novo Produto Recebido ===");
-        System.out.println("Nome: " + nome);
-        System.out.println("Descrição: " + descricao);
-        System.out.println("Preço: " + preco);
-        System.out.println("=============================");
+    // Log estruturado em uma única linha (Sonar S106: evitar System.out)
+    log.info("Novo produto recebido | nome='{}' | descricao='{}' | preco={}", nome, descricao, preco);
         // Redireciona para a home após o POST
         return "redirect:/principal";
     }
