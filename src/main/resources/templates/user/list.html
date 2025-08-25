@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Usuários</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 1.5rem; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: .5rem; text-align: left; }
+        th { background: #f3f3f3; }
+        a { text-decoration: none; color: #0a558c; }
+    </style>
+</head>
+<body>
+<h1>Lista de Usuários</h1>
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Nome</th>
+        <th>Email</th>
+        <th>Status</th>
+        <th>Role</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="u : ${users}">
+        <td th:text="${u.id}"></td>
+        <td th:text="${u.nome}"></td>
+        <td th:text="${u.email}"></td>
+        <td th:text="${u.status}"></td>
+        <td th:text="${u.role}"></td>
+        <td><a th:href="@{'/users/' + ${u.id}}">Detalhes</a></td>
+    </tr>
+    </tbody>
+</table>
+
+<h2>Novo Usuário</h2>
+<form th:action="@{/users}" th:object="${userForm}" method="post" style="margin-top:1rem;">
+    <div>
+        <label>Nome:<br>
+            <input type="text" th:field="*{nome}" />
+        </label>
+        <div style="color:red" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></div>
+    </div>
+    <div>
+        <label>Email:<br>
+            <input type="email" th:field="*{email}" />
+        </label>
+        <div style="color:red" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+    </div>
+    <div>
+        <label>Status:<br>
+            <select th:field="*{status}">
+                <option th:each="s : ${T(br.edu.iff.ccc.webappigormonteiro.model.UserSystem.Status).values()}" th:value="${s}" th:text="${s}"></option>
+            </select>
+        </label>
+        <div style="color:red" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></div>
+    </div>
+    <div>
+        <label>Role:<br>
+            <select th:field="*{role}">
+                <option th:each="r : ${T(br.edu.iff.ccc.webappigormonteiro.model.UserSystem.Role).values()}" th:value="${r}" th:text="${r}"></option>
+            </select>
+        </label>
+        <div style="color:red" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></div>
+    </div>
+    <div style="margin-top:.5rem;">
+        <button type="submit">Salvar</button>
+    </div>
+</form>
+</body>
+</html>
