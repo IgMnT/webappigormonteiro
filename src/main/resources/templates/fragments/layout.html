@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" th:href="@{/css/style.css}" href="/css/style.css" />
+    <title th:remove="tag">Layout Base</title>
+    <!-- Aqui poderia entrar um CSS externo futuramente -->
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- fonts optional -->
+</head>
+<body>
+<header th:fragment="header(title)">
+    <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:1rem;">
+        <h1 th:text="${title}">Aplicação</h1>
+        <nav>
+            <a href="/principal">Home</a>
+            <a href="/users">Usuários</a>
+            <a href="/desafios">Desafios</a>
+            <a href="/h2-console" target="_blank">H2</a>
+        </nav>
+    </div>
+</header>
+
+<footer th:fragment="footer">
+    <div class="container">
+        <span>&copy; <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}">2025</span> Plataforma de Desafios</span>
+    </div>
+</footer>
+</body>
+</html>

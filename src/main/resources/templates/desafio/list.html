@@ -3,19 +3,11 @@
 <head>
     <meta charset="UTF-8" />
     <title>Desafios</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 2rem; }
-        table { border-collapse: collapse; width: 100%; margin-top: 1rem; }
-        th, td { border: 1px solid #ccc; padding: 0.5rem; text-align: left; }
-        th { background: #f0f0f0; }
-        form.inline { display: inline; }
-        .form-container { margin-top: 2rem; }
-        label { display: block; margin-top: .5rem; }
-        input, select { padding: .4rem; }
-    </style>
+    <th:block th:replace="~{fragments/layout :: head}"></th:block>
 </head>
 <body>
-<h1>Desafios</h1>
+<th:block th:replace="~{fragments/layout :: header('Desafios')}"></th:block>
+<div class="container">
 <table>
     <thead>
     <tr>
@@ -34,7 +26,7 @@
         <td th:text="${d.linguagemUtilizada}"></td>
         <td>
             <form th:action="@{'/desafios/' + ${d.id} + '/delete'}" method="post" class="inline">
-                <button type="submit">Excluir</button>
+                <button type="submit" class="btn btn-danger">Excluir</button>
             </form>
         </td>
     </tr>
@@ -43,23 +35,28 @@
 
 <div class="form-container">
     <h2>Novo Desafio</h2>
-    <form action="/desafios" method="post">
+    <form th:action="@{/desafios}" th:object="${desafioForm}" method="post">
         <label>Dificuldade:
-            <input name="dificuldade" required />
+            <input th:field="*{dificuldade}" required />
         </label>
+        <div style="color:red" th:if="${#fields.hasErrors('dificuldade')}" th:errors="*{dificuldade}"></div>
         <label>Autor:
-            <select name="autorId" required>
+            <select th:field="*{autorId}" required>
                 <option value="" disabled selected>Selecione...</option>
                 <option th:each="u : ${users}" th:value="${u.id}" th:text="${u.nome}"></option>
             </select>
         </label>
+        <div style="color:red" th:if="${#fields.hasErrors('autorId')}" th:errors="*{autorId}"></div>
         <label>Linguagem:
-            <input name="linguagemUtilizada" required />
+            <input th:field="*{linguagemUtilizada}" required />
         </label>
-        <button type="submit">Salvar</button>
+        <div style="color:red" th:if="${#fields.hasErrors('linguagemUtilizada')}" th:errors="*{linguagemUtilizada}"></div>
+    <button type="submit" class="btn">Salvar</button>
     </form>
 </div>
 
 <p><a href="/users">Voltar Usuários</a></p>
+</div>
+<th:block th:replace="~{fragments/layout :: footer}"></th:block>
 </body>
 </html>

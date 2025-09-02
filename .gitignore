@@ -31,3 +31,17 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### OS/Editor ###
+.DS_Store
+Thumbs.db
+
+### Logs ###
+*.log
+logs/
+
+### H2 ###
+*.mv.db
+*.trace.db
+data/*.mv.db
+data/*.trace.db
