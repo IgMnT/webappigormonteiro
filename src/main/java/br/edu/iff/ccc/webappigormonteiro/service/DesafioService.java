@@ -1,7 +1,7 @@
 package br.edu.iff.ccc.webappigormonteiro.service;
 
-import br.edu.iff.ccc.webappigormonteiro.model.Desafio;
-import br.edu.iff.ccc.webappigormonteiro.model.UserSystem;
+import br.edu.iff.ccc.webappigormonteiro.entity.Desafio;
+import br.edu.iff.ccc.webappigormonteiro.entity.UserSystem;
 import br.edu.iff.ccc.webappigormonteiro.repository.DesafioRepository;
 import org.springframework.stereotype.Service;
 

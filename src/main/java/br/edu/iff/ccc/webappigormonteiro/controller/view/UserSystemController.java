@@ -1,6 +1,7 @@
 package br.edu.iff.ccc.webappigormonteiro.controller.view;
 
-import br.edu.iff.ccc.webappigormonteiro.model.UserSystem;
+import br.edu.iff.ccc.webappigormonteiro.dto.UserSystemDTO;
+import br.edu.iff.ccc.webappigormonteiro.entity.UserSystem;
 import br.edu.iff.ccc.webappigormonteiro.service.UserSystemService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,7 +23,7 @@ public class UserSystemController {
     @GetMapping
     public String listar(Model model) {
         model.addAttribute("users", service.listarTodos());
-    model.addAttribute("userForm", new UserSystem());
+        model.addAttribute("userForm", new UserSystemDTO());
         return "user/list"; // templates/user/list.html
     }
 
@@ -34,7 +35,7 @@ public class UserSystemController {
     }
 
     @PostMapping
-    public String criar(@Valid @ModelAttribute("userForm") UserSystem form,
+    public String criar(@Valid @ModelAttribute("userForm") UserSystemDTO form,
                         BindingResult bindingResult,
                         Model model) {
         if (bindingResult.hasErrors()) {

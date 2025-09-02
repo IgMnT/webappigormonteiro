@@ -1,8 +1,8 @@
 package br.edu.iff.ccc.webappigormonteiro.service;
 
-import br.edu.iff.ccc.webappigormonteiro.model.UserSystem;
-import br.edu.iff.ccc.webappigormonteiro.model.UserSystem.Role;
-import br.edu.iff.ccc.webappigormonteiro.model.UserSystem.Status;
+import br.edu.iff.ccc.webappigormonteiro.entity.UserSystem;
+import br.edu.iff.ccc.webappigormonteiro.entity.UserSystem.Role;
+import br.edu.iff.ccc.webappigormonteiro.entity.UserSystem.Status;
 import br.edu.iff.ccc.webappigormonteiro.repository.UserSystemRepository;
 import org.springframework.stereotype.Service;
 
