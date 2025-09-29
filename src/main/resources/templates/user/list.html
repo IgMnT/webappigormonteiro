@@ -8,6 +8,8 @@
 <body>
 <th:block th:replace="~{fragments/layout :: header('Usuários')}"></th:block>
 <div class="container">
+    <div th:if="${messageSuccess}" class="alert alert-success" th:text="${messageSuccess}"></div>
+    <div th:if="${messageError}" class="alert alert-danger" th:text="${messageError}"></div>
 <table>
     <thead>
     <tr>
@@ -16,7 +18,7 @@
         <th>Email</th>
         <th>Status</th>
         <th>Role</th>
-        <th></th>
+        <th class="center">Ações</th>
     </tr>
     </thead>
     <tbody>
@@ -26,13 +28,21 @@
         <td th:text="${u.email}"></td>
         <td th:text="${u.status}"></td>
         <td th:text="${u.role}"></td>
-        <td><a th:href="@{'/users/' + ${u.id}}">Detalhes</a></td>
+        <td>
+            <a class="btn btn-link" th:href="@{'/users/' + ${u.id}}">Detalhes</a>
+            <a class="btn btn-link" th:href="@{'/users/' + ${u.id} + '/edit'}">Editar</a>
+            <form th:action="@{'/users/' + ${u.id} + '/delete'}" method="post" class="inline" style="display:inline-block;margin-left:.5rem;">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit" class="btn btn-danger" onclick="return confirm('Deseja realmente remover este usuário?');">Remover</button>
+            </form>
+        </td>
     </tr>
     </tbody>
     </table>
 
     <h2 class="space-top">Novo Usuário</h2>
     <form th:action="@{/users}" th:object="${userForm}" method="post" class="form-container">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
     <div>
         <label>Nome:<br>
             <input type="text" th:field="*{nome}" />
@@ -56,15 +66,69 @@
     <div>
         <label>Role:<br>
             <select th:field="*{role}">
-                <option th:each="r : ${T(br.edu.iff.ccc.webappigormonteiro.entity.UserSystem.Role).values()}" th:value="${r}" th:text="${r}"></option>
+                <option th:each="r : ${roles}" th:value="${r}" th:text="${r}"></option>
             </select>
         </label>
         <div style="color:red" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></div>
+    </div>
+    <div>
+        <label>Senha:<br>
+            <input type="password" th:field="*{senha}" placeholder="mínimo 8 caracteres" />
+        </label>
+        <div style="color:red" th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}"></div>
     </div>
     <div class="space-top">
         <button type="submit" class="btn">Salvar</button>
     </div>
     </form>
+
+    <div class="space-top" th:if="${editForm}">
+        <h2>Editar Usuário</h2>
+        <form th:action="@{'/users/' + ${editForm.id} + '/update'}" th:object="${editForm}" method="post" class="form-container">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <div th:if="${#fields.hasGlobalErrors()}" class="alert alert-danger">
+                <p th:each="err : ${#fields.globalErrors()}" th:text="${err}"></p>
+            </div>
+            <div>
+                <label>Nome:<br>
+                    <input type="text" th:field="*{nome}" />
+                </label>
+                <div style="color:red" th:if="${#fields.hasErrors('nome')}" th:errors="*{nome}"></div>
+            </div>
+            <div>
+                <label>Email:<br>
+                    <input type="email" th:field="*{email}" />
+                </label>
+                <div style="color:red" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
+            </div>
+            <div>
+                <label>Status:<br>
+                    <select th:field="*{status}">
+                        <option th:each="s : ${T(br.edu.iff.ccc.webappigormonteiro.entity.UserSystem.Status).values()}" th:value="${s}" th:text="${s}"></option>
+                    </select>
+                </label>
+                <div style="color:red" th:if="${#fields.hasErrors('status')}" th:errors="*{status}"></div>
+            </div>
+            <div>
+                <label>Role:<br>
+                    <select th:field="*{role}">
+                        <option th:each="r : ${roles}" th:value="${r}" th:text="${r}"></option>
+                    </select>
+                </label>
+                <div style="color:red" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></div>
+            </div>
+            <div>
+                <label>Nova senha (opcional):<br>
+                    <input type="password" th:field="*{novaSenha}" placeholder="mínimo 8 caracteres" />
+                </label>
+                <div style="color:red" th:if="${#fields.hasErrors('novaSenha')}" th:errors="*{novaSenha}"></div>
+            </div>
+            <div class="space-top" style="display:flex;gap:.75rem;flex-wrap:wrap;">
+                <button type="submit" class="btn">Atualizar</button>
+                <a th:href="@{/users}" class="btn btn-link">Cancelar</a>
+            </div>
+        </form>
+    </div>
 </div>
 <th:block th:replace="~{fragments/layout :: footer}"></th:block>
 </body>

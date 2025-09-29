@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Erro inesperado</title>
+    <th:block th:replace="~{fragments/layout :: head}"></th:block>
+</head>
+<body>
+<th:block th:replace="~{fragments/layout :: header('Ops! Algo deu errado')}"></th:block>
+<div class="container">
+    <div class="card">
+        <p th:text="${mensagem != null ? mensagem : 'Ocorreu um erro inesperado. Tente novamente mais tarde.'}">
+            Ocorreu um erro inesperado. Tente novamente mais tarde.
+        </p>
+        <div th:if="${stacktrace != null}">
+            <details>
+                <summary>Detalhes técnicos</summary>
+                <pre th:text="${stacktrace}"></pre>
+            </details>
+        </div>
+        <a class="btn" th:href="@{/principal}">Voltar para a Home</a>
+    </div>
+</div>
+<th:block th:replace="~{fragments/layout :: footer}"></th:block>
+</body>
+</html>

@@ -24,6 +24,10 @@ public class UserSystemDTO {
     @NotNull
     private UserSystem.Role role;
 
+    @NotBlank
+    @Size(min = 8, max = 72)
+    private String senha;
+
     public String getNome() { return nome; }
     public void setNome(String nome) { this.nome = nome; }
 
@@ -35,4 +39,7 @@ public class UserSystemDTO {
 
     public UserSystem.Role getRole() { return role; }
     public void setRole(UserSystem.Role role) { this.role = role; }
+
+    public String getSenha() { return senha; }
+    public void setSenha(String senha) { this.senha = senha; }
 }
