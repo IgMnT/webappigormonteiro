@@ -15,7 +15,7 @@ import java.util.List;
 public class UserSystem {
 
     public enum Status { ATIVO, INATIVO }
-    public enum Role { ADMIN, USER, GUEST }
+    public enum Role { ADMIN, AUTHOR, VISITOR }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,17 +42,23 @@ public class UserSystem {
     @Column(nullable = false, length = 20)
     private Role role;
 
+    @NotBlank
+    @Size(min = 8, max = 120)
+    @Column(name = "password_hash", nullable = false, length = 120)
+    private String passwordHash;
+
     @OneToMany(mappedBy = "autor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Desafio> desafios = new ArrayList<>();
 
     public UserSystem() {}
 
-    public UserSystem(Long id, String nome, String email, Status status, Role role) {
+    public UserSystem(Long id, String nome, String email, Status status, Role role, String passwordHash) {
         this.id = id;
         this.nome = nome;
         this.email = email;
         this.status = status;
         this.role = role;
+        this.passwordHash = passwordHash;
     }
 
     public Long getId() { return id; }
@@ -69,6 +75,9 @@ public class UserSystem {
 
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+
+    public String getPasswordHash() { return passwordHash; }
+    public void setPasswordHash(String passwordHash) { this.passwordHash = passwordHash; }
 
     public List<Desafio> getDesafios() { return desafios; }
     public void addDesafio(Desafio d) {
