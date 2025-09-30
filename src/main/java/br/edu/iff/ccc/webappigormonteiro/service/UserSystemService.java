@@ -1,6 +1,7 @@
 package br.edu.iff.ccc.webappigormonteiro.service;
 
 import br.edu.iff.ccc.webappigormonteiro.dto.UserSystemDTO;
+import br.edu.iff.ccc.webappigormonteiro.dto.UserSystemPatchDTO;
 import br.edu.iff.ccc.webappigormonteiro.dto.UserSystemUpdateDTO;
 import br.edu.iff.ccc.webappigormonteiro.entity.UserSystem;
 import br.edu.iff.ccc.webappigormonteiro.entity.UserSystem.Role;
@@ -51,6 +52,19 @@ public class UserSystemService {
 
     public List<UserSystem> listarAtivos() {
         return repository.findByStatus(Status.ATIVO);
+    }
+
+    public List<UserSystem> buscarPorFiltro(Status status, Role role) {
+        if (status != null && role != null) {
+            return repository.findByStatusAndRole(status, role);
+        }
+        if (status != null) {
+            return repository.findByStatus(status);
+        }
+        if (role != null) {
+            return repository.findByRole(role);
+        }
+        return listarTodos();
     }
 
     public List<UserSystem> listarPossiveisAutores() {
@@ -108,7 +122,7 @@ public class UserSystemService {
             });
         }
 
-        boolean unicoAdmin = user.getRole() == Role.ADMIN && repository.countByRole(Role.ADMIN) <= 1;
+        boolean unicoAdmin = isUnicoAdmin(user);
         if (unicoAdmin && dto.getRole() != Role.ADMIN) {
             throw new BusinessException("Não é possível alterar o perfil do único administrador.");
         }
@@ -130,5 +144,56 @@ public class UserSystemService {
         }
 
         return repository.save(user);
+    }
+
+    @Transactional
+    public UserSystem atualizarParcial(Long id, UserSystemPatchDTO dto) {
+        UserSystem user = buscarPorId(id);
+
+        if (dto.getEmail() != null) {
+            String emailNormalizado = dto.getEmail().trim().toLowerCase();
+            if (!emailNormalizado.equalsIgnoreCase(user.getEmail())) {
+                repository.findByEmail(emailNormalizado).ifPresent(existing -> {
+                    throw new BusinessException("Já existe um usuário com esse e-mail");
+                });
+                user.setEmail(emailNormalizado);
+            }
+        }
+
+        if (dto.getNome() != null) {
+            String nome = dto.getNome().trim();
+            if (nome.isEmpty()) {
+                throw new BusinessException("O nome do usuário não pode ser vazio");
+            }
+            user.setNome(nome);
+        }
+
+        if (dto.getStatus() != null) {
+            if (isUnicoAdmin(user) && dto.getStatus() != Status.ATIVO) {
+                throw new BusinessException("Não é possível inativar o único administrador.");
+            }
+            user.setStatus(dto.getStatus());
+        }
+
+        if (dto.getRole() != null) {
+            if (isUnicoAdmin(user) && dto.getRole() != Role.ADMIN) {
+                throw new BusinessException("Não é possível alterar o perfil do único administrador.");
+            }
+            user.setRole(dto.getRole());
+        }
+
+        if (dto.getNovaSenha() != null && !dto.getNovaSenha().isBlank()) {
+            String trimmed = dto.getNovaSenha().trim();
+            if (trimmed.length() < 8) {
+                throw new BusinessException("A nova senha deve ter pelo menos 8 caracteres.");
+            }
+            user.setPasswordHash(passwordEncoder.encode(trimmed));
+        }
+
+        return repository.save(user);
+    }
+
+    private boolean isUnicoAdmin(UserSystem user) {
+        return user.getRole() == Role.ADMIN && repository.countByRole(Role.ADMIN) <= 1;
     }
 }
