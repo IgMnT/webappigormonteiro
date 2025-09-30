@@ -51,6 +51,23 @@ Passos:
 Notas:
 - A base H2 é recriada a cada start (spring.jpa.hibernate.ddl-auto=create). Ajuste para `update` em produção.
 
+### API REST
+
+- Base URL: `http://localhost:8080/api/v1`
+- Recursos expostos:
+	- `GET /users` lista usuários com filtros opcionais `status` e `role`.
+	- `POST /users`, `GET /users/{id}`, `PUT /users/{id}`, `PATCH /users/{id}`, `DELETE /users/{id}`.
+	- `GET /categorias` com filtro `nome`, além de `POST`, `GET /{id}`, `PUT`, `PATCH`, `DELETE`.
+	- `GET /desafios` com filtros `dificuldade`, `autorId`, `categoriaId`, além de `POST`, `GET /{id}`, `PUT`, `PATCH`, `DELETE`.
+- As respostas seguem os códigos HTTP semânticos (201 Created, 200 OK, 204 No Content e Problem Details para erros).
+- Requests `PATCH` aceitam somente os campos a serem alterados.
+
+### Documentação interativa (Swagger)
+
+- A documentação está disponível em: `http://localhost:8080/swagger-ui/index.html`
+- O arquivo OpenAPI é servido em `http://localhost:8080/v3/api-docs`
+- Cada endpoint está anotado com exemplos de respostas e códigos de status.
+
 ### Usuários de exemplo
 
 | Perfil  | Email               | Senha         | Permissões principais |
@@ -108,6 +125,12 @@ Execute a suíte de testes (unitários e de integração) com:
 ```
 
 Os testes cobrem autenticação de usuários e regras de negócio de categorias.
+
+## Entrega da Avaliação
+
+- Abra um Pull Request da branch `develop` para `main` com o título **Entrega Final P2**.
+- Marque o commit final desta entrega com a tag Git `v2.0-FINAL`.
+- Garanta que o pipeline de testes (`./mvnw clean test`) esteja passando antes de enviar a entrega.
 
 ## Contribuição (Commits Semânticos)
 

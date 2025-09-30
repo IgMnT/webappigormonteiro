@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 
+import java.net.URI;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
@@ -22,9 +24,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public Object handleResourceNotFound(ResourceNotFoundException ex, HttpServletRequest request) {
-        if (isJsonRequest(request)) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(new ErrorInfo(request.getRequestURI(), ex.getMessage(), "NOT_FOUND"));
+        if (isApiRequest(request)) {
+            ProblemDetail problem = createProblem(HttpStatus.NOT_FOUND, "Recurso não encontrado", ex.getMessage(), request);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(problem);
         }
         ModelAndView mv = new ModelAndView("error/404");
         mv.addObject("mensagem", ex.getMessage());
@@ -33,9 +35,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     public Object handleBusiness(BusinessException ex, HttpServletRequest request) {
-        if (isJsonRequest(request)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorInfo(request.getRequestURI(), ex.getMessage(), "BUSINESS_ERROR"));
+        if (isApiRequest(request)) {
+            ProblemDetail problem = createProblem(HttpStatus.BAD_REQUEST, "Regra de negócio violada", ex.getMessage(), request);
+            return ResponseEntity.badRequest().body(problem);
         }
         ModelAndView mv = new ModelAndView("error/error");
         mv.addObject("mensagem", ex.getMessage());
@@ -44,9 +46,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public Object handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
-        if (isJsonRequest(request)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new ErrorInfo(request.getRequestURI(), ex.getMessage(), "ACCESS_DENIED"));
+        if (isApiRequest(request)) {
+            ProblemDetail problem = createProblem(HttpStatus.FORBIDDEN, "Acesso negado", ex.getMessage(), request);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problem);
         }
         ModelAndView mv = new ModelAndView("error/403");
         mv.addObject("mensagem", ex.getMessage());
@@ -58,9 +60,14 @@ public class GlobalExceptionHandler {
         String message = ex.getBindingResult().getFieldErrors().stream()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.joining(", "));
-        if (isJsonRequest(request)) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorInfo(request.getRequestURI(), message, "VALIDATION_ERROR"));
+        if (isApiRequest(request)) {
+            ProblemDetail problem = createProblem(HttpStatus.BAD_REQUEST, "Dados inválidos", message, request);
+            problem.setProperty("errors", ex.getBindingResult().getFieldErrors().stream()
+                    .map(error -> {
+                        return error.getField() + ": " + error.getDefaultMessage();
+                    })
+                    .toList());
+            return ResponseEntity.badRequest().body(problem);
         }
         ModelAndView mv = new ModelAndView("error/error");
         mv.addObject("mensagem", message);
@@ -70,9 +77,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public Object handleDefault(Exception ex, HttpServletRequest request) {
         log.error("Erro não tratado", ex);
-        if (isJsonRequest(request)) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ErrorInfo(request.getRequestURI(), ex.getMessage(), "INTERNAL_ERROR"));
+        if (isApiRequest(request)) {
+            ProblemDetail problem = createProblem(HttpStatus.INTERNAL_SERVER_ERROR, "Erro inesperado", ex.getMessage(), request);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(problem);
         }
         ModelAndView mv = new ModelAndView("error/error");
         mv.addObject("mensagem", ex.getMessage());
@@ -80,9 +87,12 @@ public class GlobalExceptionHandler {
         return mv;
     }
 
-    private boolean isJsonRequest(HttpServletRequest request) {
+    private boolean isApiRequest(HttpServletRequest request) {
         String accept = request.getHeader(HttpHeaders.ACCEPT);
-        return accept != null && accept.contains(MediaType.APPLICATION_JSON_VALUE);
+        if (accept == null) {
+            return false;
+        }
+        return accept.contains(MediaType.APPLICATION_JSON_VALUE) || accept.contains(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
     }
 
     private String getStackTraceAsString(Exception ex) {
@@ -91,5 +101,16 @@ public class GlobalExceptionHandler {
             sb.append(element).append(System.lineSeparator());
         }
         return sb.toString();
+    }
+
+    private ProblemDetail createProblem(HttpStatus status, String title, String detail, HttpServletRequest request) {
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(status, detail);
+        problem.setTitle(title);
+        problem.setType(status.is4xxClientError()
+                ? URI.create("https://httpstatuses.io/" + status.value())
+                : URI.create("about:blank"));
+    problem.setInstance(URI.create(request.getRequestURI()));
+        problem.setProperty("path", request.getRequestURI());
+        return problem;
     }
 }
