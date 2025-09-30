@@ -1,5 +1,7 @@
 package br.edu.iff.ccc.webappigormonteiro.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +18,8 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableMethodSecurity
 public class SecurityConfig {
 
+        private static final Logger log = LoggerFactory.getLogger(SecurityConfig.class);
+
         @Value("${app.security.enabled:true}")
         private boolean securityEnabled;
 
@@ -27,6 +31,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
                 if (!securityEnabled) {
+                        log.warn("Security bypass is ACTIVE: all HTTP requests are being permitted without authentication.");
                         http
                                         .csrf(AbstractHttpConfigurer::disable)
                                         .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
