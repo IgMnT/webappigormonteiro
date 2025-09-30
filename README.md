@@ -83,6 +83,14 @@ Para encerrar, finalize o processo no terminal (`Ctrl+C`).
   - `/users/**`: exclusivo de `ADMIN`.
   - API REST (`/api/v1/**`): exige autenticação (mesma sessão gerada pelo login).
 
+  ### Bypass temporário (modo avaliação)
+
+  Para entregar a coleção de requisições sem precisar autenticar, defina `app.security.enabled=false` em `application.properties`. Com o toggle desativado:
+
+  - Todas as rotas passam a responder sem exigir login.
+  - CSRF e fluxos de formulário são desabilitados.
+  - Lembre-se de voltar o valor para `true` após a avaliação para restaurar as proteções padrão.
+
 ## Dados iniciais
 
 O seed automático cria contas e categorias, permitindo testar rapidamente o fluxo completo:
