@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-br" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="pt-br" xmlns:th="http://www.thymeleaf.org">
 <head>
         <meta charset="UTF-8">
         <title>Página principal</title>
@@ -10,26 +10,21 @@
 <div class="container">
                 <h2>Bem-vindo à Plataforma de Desafios</h2>
                 <p>Gerencie desafios de programação, usuários e categorias em um só lugar.</p>
-                <div sec:authorize="isAnonymous()" class="card space-top">
-                        <h3>Primeiros passos</h3>
-                        <p>Para acessar os desafios e recursos avançados, faça login com suas credenciais.</p>
-                        <a class="btn" th:href="@{/login}">Entrar</a>
-                </div>
-                <div sec:authorize="hasRole('ADMIN')" class="card space-top">
-                        <h3>Próximas ações sugeridas</h3>
+                <div class="card space-top">
+                        <h3>Próximos passos</h3>
                         <ul>
                                 <li><a th:href="@{/users}">Gerenciar contas de usuários</a></li>
-                                <li><a th:href="@{/categorias}">Criar novas categorias de desafios</a></li>
-                                <li><a th:href="@{/desafios}">Cadastrar desafios para a comunidade</a></li>
+                                <li><a th:href="@{/categorias}">Criar categorias de desafios</a></li>
+                                <li><a th:href="@{/desafios}">Cadastrar novos desafios</a></li>
                         </ul>
                 </div>
-                <div sec:authorize="hasRole('AUTHOR')" class="card space-top">
-                        <h3>Como autor</h3>
-                        <p>Crie novos desafios na aba <strong>Desafios</strong> e acompanhe suas submissões.</p>
+                <div class="card space-top">
+                        <h3>Como colaborador</h3>
+                        <p>Utilize a seção <strong>Desafios</strong> para registrar novos exercícios e compartilhar conhecimento.</p>
                 </div>
-                <div sec:authorize="hasRole('VISITOR')" class="card space-top">
+                <div class="card space-top">
                         <h3>Como visitante</h3>
-                        <p>Explore os desafios disponíveis e escolha em qual categoria deseja praticar.</p>
+                        <p>Explore livremente todos os desafios disponíveis e encontre inspirações para praticar.</p>
                 </div>
 </div>
 <th:block th:replace="~{fragments/layout :: footer}"></th:block>

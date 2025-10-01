@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <title>Desafios</title>
@@ -16,8 +16,8 @@
         <th>Dificuldade</th>
         <th>Categoria</th>
         <th>Autor</th>
-        <th>Linguagem</th>
-        <th sec:authorize="hasAnyRole('ADMIN','AUTHOR')">Ações</th>
+    <th>Linguagem</th>
+    <th>Ações</th>
     </tr>
     </thead>
     <tbody>
@@ -31,9 +31,8 @@
         <td th:text="${d.categoria != null ? d.categoria.nome : '—'}"></td>
         <td th:text="${d.autor != null ? d.autor.nome : '—'}"></td>
         <td th:text="${d.linguagemUtilizada}"></td>
-        <td sec:authorize="hasRole('ADMIN') or (hasRole('AUTHOR') and #authentication?.name == d.autor?.email)">
+        <td>
             <form th:action="@{'/desafios/' + ${d.id} + '/delete'}" method="post" class="inline">
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                 <button type="submit" class="btn btn-danger">Excluir</button>
             </form>
         </td>
@@ -41,10 +40,9 @@
     </tbody>
 </table>
 
-<div class="form-container" sec:authorize="hasAnyRole('ADMIN','AUTHOR')">
+<div class="form-container">
     <h2>Novo Desafio</h2>
     <form th:action="@{/desafios}" th:object="${desafioForm}" method="post">
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
         <label>Título:
             <input th:field="*{titulo}" required />
         </label>
@@ -57,19 +55,13 @@
             <input th:field="*{dificuldade}" required />
         </label>
         <div style="color:red" th:if="${#fields.hasErrors('dificuldade')}" th:errors="*{dificuldade}"></div>
-        <div sec:authorize="hasRole('ADMIN')">
-            <label>Autor:
-                <select th:field="*{autorId}" required>
-                    <option value="" disabled selected>Selecione...</option>
-                    <option th:each="u : ${users}" th:value="${u.id}" th:text="${u.nome}"></option>
-                </select>
-            </label>
-            <div style="color:red" th:if="${#fields.hasErrors('autorId')}" th:errors="*{autorId}"></div>
-        </div>
-        <div sec:authorize="hasRole('AUTHOR')">
-            <input type="hidden" th:field="*{autorId}" th:value="${currentUser != null ? currentUser.id : null}" />
-            <p class="small">Autor: <strong th:text="${currentUser != null ? currentUser.nome : 'Você'}"></strong></p>
-        </div>
+        <label>Autor:
+            <select th:field="*{autorId}" required>
+                <option value="" disabled selected>Selecione...</option>
+                <option th:each="u : ${users}" th:value="${u.id}" th:text="${u.nome}"></option>
+            </select>
+        </label>
+        <div style="color:red" th:if="${#fields.hasErrors('autorId')}" th:errors="*{autorId}"></div>
         <label>Categoria:
             <select th:field="*{categoriaId}" required>
                 <option value="" disabled selected>Selecione...</option>
@@ -85,7 +77,7 @@
     </form>
 </div>
 
-<p sec:authorize="hasRole('ADMIN')"><a th:href="@{/users}">Gerenciar Usuários</a></p>
+<p><a th:href="@{/users}">Gerenciar Usuários</a></p>
 </div>
 <th:block th:replace="~{fragments/layout :: footer}"></th:block>
 </body>

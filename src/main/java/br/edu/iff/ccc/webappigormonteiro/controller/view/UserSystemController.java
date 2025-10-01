@@ -7,8 +7,6 @@ import br.edu.iff.ccc.webappigormonteiro.exception.BusinessException;
 import br.edu.iff.ccc.webappigormonteiro.exception.ResourceNotFoundException;
 import br.edu.iff.ccc.webappigormonteiro.service.UserSystemService;
 import jakarta.validation.Valid;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,7 +15,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/users")
-@PreAuthorize("hasRole('ADMIN')")
 public class UserSystemController {
 
     private final UserSystemService service;
@@ -110,13 +107,9 @@ public class UserSystemController {
 
     @PostMapping("/{id}/delete")
     public String deletar(@PathVariable Long id,
-                          RedirectAttributes redirectAttributes,
-                          Authentication authentication) {
+                          RedirectAttributes redirectAttributes) {
         try {
             UserSystem alvo = service.buscarPorId(id);
-            if (authentication != null && authentication.getName().equalsIgnoreCase(alvo.getEmail())) {
-                throw new BusinessException("Você não pode remover o usuário atualmente autenticado.");
-            }
             service.remover(id);
             redirectAttributes.addFlashAttribute("messageSuccess", "Usuário removido com sucesso.");
         } catch (BusinessException | ResourceNotFoundException ex) {

@@ -10,7 +10,6 @@ import br.edu.iff.ccc.webappigormonteiro.exception.BusinessException;
 import br.edu.iff.ccc.webappigormonteiro.exception.ResourceNotFoundException;
 import br.edu.iff.ccc.webappigormonteiro.repository.UserSystemRepository;
 import jakarta.annotation.PostConstruct;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,11 +21,9 @@ import java.util.Optional;
 public class UserSystemService {
 
     private final UserSystemRepository repository;
-    private final PasswordEncoder passwordEncoder;
 
-    public UserSystemService(UserSystemRepository repository, PasswordEncoder passwordEncoder) {
+    public UserSystemService(UserSystemRepository repository) {
         this.repository = repository;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @PostConstruct
@@ -41,7 +38,7 @@ public class UserSystemService {
     private void criarUsuarioSeed(String nome, String email, Status status, Role role, String senha) {
         String emailNormalizado = email.trim().toLowerCase();
         repository.findByEmail(emailNormalizado).ifPresentOrElse(user -> {}, () -> {
-            UserSystem novo = new UserSystem(null, nome, emailNormalizado, status, role, passwordEncoder.encode(senha));
+            UserSystem novo = new UserSystem(null, nome, emailNormalizado, status, role, sanitizeSenha(senha));
             repository.save(novo);
         });
     }
@@ -91,14 +88,14 @@ public class UserSystemService {
         repository.findByEmail(emailNormalizado).ifPresent(existing -> {
             throw new BusinessException("Já existe um usuário com esse e-mail");
         });
-    UserSystem novo = new UserSystem(
-        null,
-        dto.getNome().trim(),
-        emailNormalizado,
-        dto.getStatus(),
-        dto.getRole(),
-        passwordEncoder.encode(dto.getSenha().trim())
-    );
+        UserSystem novo = new UserSystem(
+                null,
+                dto.getNome().trim(),
+                emailNormalizado,
+                dto.getStatus(),
+                dto.getRole(),
+                sanitizeSenha(dto.getSenha())
+        );
         return repository.save(novo);
     }
 
@@ -136,11 +133,7 @@ public class UserSystemService {
         user.setRole(dto.getRole());
 
         if (dto.getNovaSenha() != null && !dto.getNovaSenha().isBlank()) {
-            String trimmed = dto.getNovaSenha().trim();
-            if (trimmed.length() < 8) {
-                throw new BusinessException("A nova senha deve ter pelo menos 8 caracteres.");
-            }
-            user.setPasswordHash(passwordEncoder.encode(trimmed));
+            user.setPasswordHash(sanitizeSenha(dto.getNovaSenha()));
         }
 
         return repository.save(user);
@@ -183,11 +176,7 @@ public class UserSystemService {
         }
 
         if (dto.getNovaSenha() != null && !dto.getNovaSenha().isBlank()) {
-            String trimmed = dto.getNovaSenha().trim();
-            if (trimmed.length() < 8) {
-                throw new BusinessException("A nova senha deve ter pelo menos 8 caracteres.");
-            }
-            user.setPasswordHash(passwordEncoder.encode(trimmed));
+            user.setPasswordHash(sanitizeSenha(dto.getNovaSenha()));
         }
 
         return repository.save(user);
@@ -195,5 +184,16 @@ public class UserSystemService {
 
     private boolean isUnicoAdmin(UserSystem user) {
         return user.getRole() == Role.ADMIN && repository.countByRole(Role.ADMIN) <= 1;
+    }
+
+    private String sanitizeSenha(String senha) {
+        if (senha == null) {
+            throw new BusinessException("A senha é obrigatória.");
+        }
+        String trimmed = senha.trim();
+        if (trimmed.length() < 8) {
+            throw new BusinessException("A senha deve ter pelo menos 8 caracteres.");
+        }
+        return trimmed;
     }
 }

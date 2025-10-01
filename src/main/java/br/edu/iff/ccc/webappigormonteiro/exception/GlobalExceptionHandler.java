@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -40,17 +39,6 @@ public class GlobalExceptionHandler {
             return ResponseEntity.badRequest().body(problem);
         }
         ModelAndView mv = new ModelAndView("error/error");
-        mv.addObject("mensagem", ex.getMessage());
-        return mv;
-    }
-
-    @ExceptionHandler(AccessDeniedException.class)
-    public Object handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
-        if (isApiRequest(request)) {
-            ProblemDetail problem = createProblem(HttpStatus.FORBIDDEN, "Acesso negado", ex.getMessage(), request);
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(problem);
-        }
-        ModelAndView mv = new ModelAndView("error/403");
         mv.addObject("mensagem", ex.getMessage());
         return mv;
     }
