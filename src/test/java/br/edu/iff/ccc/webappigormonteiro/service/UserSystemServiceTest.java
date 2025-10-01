@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -20,9 +19,6 @@ class UserSystemServiceTest {
 
     @Autowired
     private UserSystemService userSystemService;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Test
     void deveAtualizarUsuarioComSucesso() {
@@ -39,7 +35,7 @@ class UserSystemServiceTest {
 
         assertThat(atualizado.getNome()).isEqualTo("Bruno Atualizado");
         assertThat(atualizado.getEmail()).isEqualTo("bruno.atualizado@example.com");
-        assertThat(passwordEncoder.matches("novaSenha123", atualizado.getPasswordHash())).isTrue();
+    assertThat(atualizado.getPasswordHash()).isEqualTo("novaSenha123");
     }
 
     @Test
